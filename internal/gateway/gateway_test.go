@@ -54,3 +54,14 @@ func TestPreprocessMiddleware_BadContentType(t *testing.T) {
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
+
+func TestCalculateDiscount(t *testing.T) {
+	// Test nil case
+	assert.Equal(t, 0.0, calculateDiscount(nil))
+	
+	// Test empty case
+	assert.Equal(t, 0.0, calculateDiscount([]string{}))
+	
+	// Test with discount times
+	assert.Equal(t, 0.1, calculateDiscount([]string{"00:00-06:00"}))
+}

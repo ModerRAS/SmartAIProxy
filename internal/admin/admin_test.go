@@ -151,3 +151,21 @@ func TestHealthHandler(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, response.Success)
 }
+
+func TestGlobalConfig_SetGet(t *testing.T) {
+	// Test setting and getting global config
+	testCfg := &config.Config{
+		Server: config.ServerConfig{
+			Listen: "0.0.0.0:8080",
+		},
+	}
+
+	SetGlobalConfig(testCfg)
+	retrievedCfg := GetGlobalConfig()
+
+	assert.Equal(t, testCfg, retrievedCfg)
+
+	// Test with nil config
+	SetGlobalConfig(nil)
+	assert.Nil(t, GetGlobalConfig())
+}
