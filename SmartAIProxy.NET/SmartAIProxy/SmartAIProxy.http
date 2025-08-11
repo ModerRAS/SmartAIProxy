@@ -1,0 +1,6 @@
+@SmartAIProxy_HostAddress = http://localhost:5198
+
+GET {{SmartAIProxy_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

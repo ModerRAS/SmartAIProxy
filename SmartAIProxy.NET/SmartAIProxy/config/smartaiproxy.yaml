@@ -1,0 +1,53 @@
+server:
+  listen: "0.0.0.0:8080"
+  timeout: 30
+  max_connections: 1000
+
+channels:
+  - name: "Free Channel A"
+    type: "openai"
+    endpoint: "https://api.openai.com/v1"
+    api_key: "your-openai-api-key"
+    price_per_token: 0
+    daily_limit: 10000
+    priority: 1
+    status: "active"
+    model_mapping: {}
+
+  - name: "Paid Channel B"
+    type: "openai"
+    endpoint: "https://api.openai.com/v1"
+    api_key: "your-openai-api-key"
+    price_per_token: 0.01
+    daily_limit: 50000
+    priority: 2
+    status: "active"
+    model_mapping: {}
+
+rules:
+  - name: "Free Priority"
+    channel: "Free Channel A"
+    expression: "day_tokens_used < daily_limit"
+    priority: 1
+
+  - name: "Discount Hours"
+    channel: "Free Channel A"
+    expression: "time_of_day >= '00:00' AND time_of_day <= '06:00'"
+    priority: 2
+
+monitor:
+  enable: true
+  prometheus_listen: "0.0.0.0:9100"
+
+security:
+  auth:
+    jwt:
+      secret: "your-super-secret-jwt-key-here-change-in-production"
+      issuer: "SmartAIProxy"
+      audience: "SmartAIProxy-Client"
+      expiry_minutes: 60
+    api_keys:
+      default: "your-api-key-here-change-in-production"
+  rate_limit:
+    requests_per_minute: 60
+    burst: 10
