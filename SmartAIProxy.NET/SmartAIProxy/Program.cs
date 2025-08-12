@@ -40,6 +40,9 @@ try
     
     // Add authorization
     builder.Services.AddAuthorization();
+    
+    // Add health checks
+    builder.Services.AddHealthChecks();
 
     var app = builder.Build();
 
