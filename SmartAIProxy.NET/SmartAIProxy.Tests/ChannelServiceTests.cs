@@ -161,4 +161,164 @@ public class ChannelServiceTests
         Assert.True(usage.ContainsKey("Test Channel"));
         Assert.Equal(150, usage["Test Channel"]);
     }
+    [Fact]
+    public void RemoveChannel_RemovesExistingChannel()
+    {
+        // Arrange
+        var channelToRemove = new ChannelConfig
+        {
+            Name = "Channel to Remove",
+            Type = "openai"
+        };
+
+        var config = new AppConfig
+        {
+            Channels = new List<ChannelConfig>
+            {
+                channelToRemove,
+                new ChannelConfig { Name = "Keep Channel", Type = "openai" }
+            }
+        };
+
+        _mockConfigService.Setup(x => x.GetConfig()).Returns(config);
+
+        // Act
+        _channelService.RemoveChannel("Channel to Remove");
+
+        // Assert
+        Assert.Single(config.Channels);
+        Assert.Equal("Keep Channel", config.Channels[0].Name);
+        _mockConfigService.Verify(x => x.UpdateConfig(config), Times.Once);
+    }
+
+    [Fact]
+    public void RemoveChannel_DoesNothingWhenChannelNotFound()
+    {
+        // Arrange
+        var config = new AppConfig
+        {
+            Channels = new List<ChannelConfig>
+            {
+                new ChannelConfig { Name = "Keep Channel", Type = "openai" }
+            }
+        };
+
+        _mockConfigService.Setup(x => x.GetConfig()).Returns(config);
+
+        // Act
+        _channelService.RemoveChannel("Nonexistent Channel");
+
+        // Assert
+        Assert.Single(config.Channels);
+        _mockConfigService.Verify(x => x.UpdateConfig(It.IsAny<AppConfig>()), Times.Never);
+    }
+
+    [Fact]
+    public void UpdateChannelStatus_UpdatesExistingChannelStatus()
+    {
+        // Arrange
+        var channelToUpdate = new ChannelConfig
+        {
+            Name = "Channel to Update",
+            Type = "openai",
+            Status = "active"
+        };
+
+        var config = new AppConfig
+        {
+            Channels = new List<ChannelConfig> { channelToUpdate }
+        };
+
+        _mockConfigService.Setup(x => x.GetConfig()).Returns(config);
+
+        // Act
+        _channelService.UpdateChannelStatus("Channel to Update", "inactive");
+
+        // Assert
+        Assert.Equal("inactive", config.Channels[0].Status);
+        _mockConfigService.Verify(x => x.UpdateConfig(config), Times.Once);
+    }
+
+    [Fact]
+    public void UpdateChannelStatus_DoesNothingWhenChannelNotFound()
+    {
+        // Arrange
+        var config = new AppConfig
+        {
+            Channels = new List<ChannelConfig>
+            {
+                new ChannelConfig { Name = "Existing Channel", Type = "openai", Status = "active" }
+            }
+        };
+
+        _mockConfigService.Setup(x => x.GetConfig()).Returns(config);
+
+        // Act
+        _channelService.UpdateChannelStatus("Nonexistent Channel", "inactive");
+
+        // Assert
+        Assert.Equal("active", config.Channels[0].Status);
+        _mockConfigService.Verify(x => x.UpdateConfig(It.IsAny<AppConfig>()), Times.Never);
+    }
+
+    [Fact]
+    public void GetChannelUsage_ReturnsEmptyDictionaryWhenNoUsage()
+    {
+        // Act
+        var usage = _channelService.GetChannelUsage();
+
+        // Assert
+        Assert.NotNull(usage);
+        Assert.Empty(usage);
+    }
+
+    [Fact]
+    public void UpdateChannelUsage_AddsNewChannelWhenNotExists()
+    {
+        // Act
+        _channelService.UpdateChannelUsage("New Channel", 100);
+        var usage = _channelService.GetChannelUsage();
+
+        // Assert
+        Assert.True(usage.ContainsKey("New Channel"));
+        Assert.Equal(100, usage["New Channel"]);
+    }
+
+    [Fact]
+    public void UpdateChannelUsage_UpdatesExistingChannel()
+    {
+        // Act
+        _channelService.UpdateChannelUsage("Existing Channel", 100);
+        _channelService.UpdateChannelUsage("Existing Channel", 200);
+        var usage = _channelService.GetChannelUsage();
+
+        // Assert
+        Assert.True(usage.ContainsKey("Existing Channel"));
+        Assert.Equal(300, usage["Existing Channel"]);
+    }
+
+    [Fact]
+    public void UpdateChannelUsage_HandlesNegativeTokens()
+    {
+        // Act
+        _channelService.UpdateChannelUsage("Test Channel", 100);
+        _channelService.UpdateChannelUsage("Test Channel", -50);
+        var usage = _channelService.GetChannelUsage();
+
+        // Assert
+        Assert.True(usage.ContainsKey("Test Channel"));
+        Assert.Equal(50, usage["Test Channel"]);
+    }
+
+    [Fact]
+    public void UpdateChannelUsage_HandlesZeroTokens()
+    {
+        // Act
+        _channelService.UpdateChannelUsage("Test Channel", 0);
+        var usage = _channelService.GetChannelUsage();
+
+        // Assert
+        Assert.True(usage.ContainsKey("Test Channel"));
+        Assert.Equal(0, usage["Test Channel"]);
+    }
 }
