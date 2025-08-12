@@ -1,121 +1,161 @@
-# SmartAIProxy
+# SmartAIProxy .NET 9 Implementation
 
-高性能、可扩展的AI API中转服务，支持主流AI模型（如OpenAI、Anthropic Claude、Google Gemini等）的API请求转发。
+[![.NET 9](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/download/dotnet/9.0)
+[![Build Status](https://github.com/ModerRAS/SmartAIProxy/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/ModerRAS/SmartAIProxy/actions)
+[![License](https://img.shields.io/github/license/ModerRAS/SmartAIProxy)](LICENSE)
 
-## 功能特性
+This is a complete .NET 9 implementation of the SmartAIProxy, a high-performance, extensible AI API gateway service that forwards API requests to major AI models (OpenAI, Anthropic Claude, Google Gemini, etc.).
 
-- **多渠道商支持**: 灵活配置认证、价格、优先级、免费额度、折扣等参数
-- **智能路由**: 基于复杂规则表达式自动选择最省钱、最优质的渠道商
-- **高可用**: 标准化错误处理、自动重试、故障容错与自动切换
-- **监控统计**: Prometheus指标采集，实时监控服务状态
-- **安全管理**: JWT/API Key鉴权，敏感信息脱敏，请求限流
-- **配置管理**: YAML/JSON配置，支持热更新和管理后台
+[中文文档](README_zh.md)
 
-## 技术栈
+## Features
 
-- **语言**: Go 1.20+
-- **框架**: Gin
-- **表达式引擎**: govaluate
-- **监控**: Prometheus
-- **配置**: YAML/JSON
+- **API Gateway**: Forwards requests to AI service providers with intelligent routing
+- **Intelligent Routing**: Selects optimal channels based on rules, quotas, and pricing
+- **Configuration Management**: YAML-based configuration with hot reload
+- **Channel Management**: Support for multiple AI providers with quota tracking
+- **Rule Engine**: Expression-based routing rules using NCalc
+- **Admin API**: RESTful endpoints for managing channels and rules
+- **Security**: JWT authentication for admin endpoints, API key authentication for gateway
+- **Monitoring**: Prometheus metrics integration
+- **Fault Tolerance**: Retry mechanisms and circuit breaker patterns
+- **Rate Limiting**: Per-API key rate limiting
+- **Logging**: Structured logging with Serilog
 
-## 快速开始
+## Architecture
 
-### 环境要求
-- Go 1.20或更高版本
+The application follows a clean architecture pattern with the following layers:
 
-### 安装部署
+1. **API Layer**: ASP.NET Core controllers and middleware
+2. **Core Layer**: Business logic services (Configuration, Channels, Rules)
+3. **Models Layer**: Data transfer objects and configuration models
+4. **Middleware Layer**: Custom proxy middleware for request forwarding
 
-```bash
-# 克隆项目
-git clone <repository-url>
-cd SmartAIProxy
-
-# 安装依赖
-go mod tidy
-
-# 构建应用
-go build -o smartaiproxy main.go
-
-# 运行服务
-./smartaiproxy
-```
-
-### 配置文件
-
-编辑 `configs/config.yaml` 文件配置服务参数：
-
-```yaml
-server:
-  listen: "0.0.0.0:8080"
-  timeout: 30
-  max_connections: 1000
-
-channels:
-  - name: "免费渠道A"
-    type: "openai"
-    endpoint: "https://api.openai.com/v1"
-    api_key: "your-api-key"
-    price_per_token: 0
-    daily_limit: 10000
-
-rules:
-  - name: "免费优先"
-    channel: "免费渠道A"
-    expression: "day_tokens_used < daily_limit"
-```
-
-## API接口
-
-### AI模型转发
-```
-POST /v1/chat/completions
-GET /v1/models
-```
-
-### 管理接口
-```
-GET /api/channels    # 获取渠道商列表
-POST /api/channels   # 更新渠道商配置
-GET /api/rules       # 获取规则列表
-POST /api/rules      # 更新规则配置
-GET /api/config      # 获取服务配置
-```
-
-### 监控接口
-```
-GET /metrics         # Prometheus指标
-GET /healthz         # 健康检查
-```
-
-## 项目结构
+## Project Structure
 
 ```
 SmartAIProxy/
-├── configs/           # 配置文件
-├── internal/          # 核心模块
-│   ├── admin/        # 管理后台
-│   ├── config/       # 配置管理
-│   ├── fault/        # 容错处理
-│   ├── gateway/      # API网关
-│   ├── logger/       # 日志系统
-│   ├── monitor/      # 监控指标
-│   ├── provider/     # 渠道商管理
-│   ├── router/       # 智能路由
-│   ├── rule/         # 规则引擎
-│   └── security/     # 安全模块
-├── logs/             # 日志文件
-└── main.go           # 程序入口
+├── SmartAIProxy/                    # Main application
+│   ├── Controllers/                # API controllers
+│   ├── Core/                       # Core business logic
+│   │   ├── Channels/              # Channel management services
+│   │   ├── Config/                # Configuration management services
+│   │   └── Rules/                 # Rule engine
+│   ├── Middleware/                 # Custom middleware
+│   ├── Models/                     # Data models and DTOs
+│   ├── config/                     # Configuration files
+│   ├── monitoring/                 # Monitoring configuration
+│   ├── Dockerfile                 # Docker configuration
+│   ├── docker-compose.yml         # Orchestration configuration
+│   └── Program.cs                 # Application entry point
+├── SmartAIProxy.Tests/             # Test suite
+│   ├── Unit/                      # Unit tests
+│   ├── Integration/               # Integration tests
+│   └── Controllers/              # Controller tests
+├── docs/                          # Documentation
+│   ├── architecture.md            # Architecture documentation
+│   ├── tech-stack.md              # Technology stack
+│   └── README.md                  # Documentation index
+├── .github/workflows/              # CI/CD workflows
+│   └── ci.yml                     # GitHub Actions configuration
+├── README.md                      # Project documentation
+└── README_zh.md                   # Chinese documentation
 ```
 
-## 测试
+## Getting Started
 
-运行单元测试：
+### Prerequisites
+
+- .NET 9 SDK
+- Docker (optional, for containerized deployment)
+
+### Building the Application
 
 ```bash
-go test ./... -v
+dotnet build
 ```
 
-## 许可证
+### Running the Application
 
-MIT License
+```bash
+dotnet run --project SmartAIProxy
+```
+
+The application will start on port 8080 by default.
+
+### Running Tests
+
+```bash
+dotnet test SmartAIProxy.Tests
+```
+
+## Configuration
+
+The application uses YAML configuration files located in the `config` directory. A default configuration file is created on first run.
+
+### Key Configuration Sections
+
+- **server**: Server settings (listen address, timeout, max connections)
+- **channels**: AI service provider configurations
+- **rules**: Routing rules with expressions
+- **monitor**: Prometheus monitoring settings
+- **security**: Authentication and rate limiting settings
+
+## API Endpoints
+
+### Gateway API
+
+- `POST /v1/chat/completions` - Forward chat completion requests
+- `POST /v1/completions` - Forward completion requests
+- `POST /v1/embeddings` - Forward embedding requests
+- `GET /healthz` - Health check endpoint
+
+### Admin API
+
+- `GET /api/channels` - Get all configured channels
+- `POST /api/channels` - Add or update channel configuration
+- `GET /api/rules` - Get all routing rules
+- `POST /api/rules` - Add or update routing rule
+- `GET /api/config` - Get current configuration
+- `GET /api/health` - Admin API health check
+- `POST /api/auth/login` - Login to get JWT token
+
+## Docker Support
+
+The application includes Docker configuration for containerized deployment:
+
+```bash
+docker build -t smartaiproxy .
+docker run -p 8080:8080 smartaiproxy
+```
+
+## Monitoring
+
+Prometheus metrics are exposed at `/metrics` endpoint. The application includes built-in metrics for:
+- Request counts and response times
+- Channel usage and success rates
+- System health and resource usage
+
+## Testing
+
+The project includes comprehensive unit tests covering:
+- Rule engine evaluation
+- Channel service operations
+- Configuration management
+
+To run tests:
+```bash
+dotnet test
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the MIT License.

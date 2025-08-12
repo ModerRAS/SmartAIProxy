@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/ModerRAS/SmartAIProxy/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/ModerRAS/SmartAIProxy/actions)
 [![License](https://img.shields.io/github/license/ModerRAS/SmartAIProxy)](LICENSE)
 
-SmartAIProxy 是一个高性能、可扩展的 AI API 网关服务，可将 API 请求转发到主要的 AI 模型（OpenAI、Anthropic Claude、Google Gemini 等）。这是基于 .NET 9 的完整实现版本。
+SmartAIProxy 是一个高性能、可扩展的 AI API 网关服务，可将 API 请求转发到主要的 AI 模型（OpenAI、Anthropic Claude、Google Gemini 等）。这是基于 .NET 9 的完整实现版本，项目结构已优化，所有代码现在位于根目录。
 
 ## 🌟 核心特性
 
@@ -54,7 +54,7 @@ SmartAIProxy 采用清洁架构模式，包含以下层次：
 4. **中间件层**: 自定义代理中间件用于请求转发
 
 ```
-SmartAIProxy.NET/
+SmartAIProxy/
 ├── SmartAIProxy/                    # 主应用
 │   ├── Controllers/                # API 控制器
 │   ├── Core/                       # 核心业务逻辑
@@ -64,17 +64,22 @@ SmartAIProxy.NET/
 │   ├── Middleware/                 # 自定义中间件
 │   ├── Models/                     # 数据模型和 DTO
 │   ├── config/                     # 配置文件
-│   ├── logs/                       # 日志文件
 │   ├── monitoring/                 # 监控配置
 │   ├── Dockerfile                 # Docker 配置
 │   ├── docker-compose.yml         # 编排配置
 │   └── Program.cs                 # 应用入口点
 ├── SmartAIProxy.Tests/             # 测试套件
-│   ├── RuleEngineTests.cs         # 规则引擎测试
-│   └── ChannelServiceTests.cs     # 通道服务测试
+│   ├── Unit/                      # 单元测试
+│   ├── Integration/               # 集成测试
+│   └── Controllers/              # 控制器测试
+├── docs/                          # 文档
+│   ├── architecture.md            # 架构文档
+│   ├── tech-stack.md              # 技术栈
+│   └── README.md                  # 文档索引
 ├── .github/workflows/              # CI/CD 工作流
 │   └── ci.yml                     # GitHub Actions 配置
-└── README.md                       # 项目文档
+├── README.md                      # 项目文档
+└── README_zh.md                   # 中文文档
 ```
 
 ## 🚀 快速开始
@@ -92,11 +97,10 @@ git clone https://github.com/ModerRAS/SmartAIProxy.git
 cd SmartAIProxy
 
 # 构建项目
-cd SmartAIProxy
 dotnet build
 
 # 运行应用
-dotnet run
+dotnet run --project SmartAIProxy
 ```
 
 应用默认在 `http://localhost:8080` 启动。
@@ -184,11 +188,10 @@ security:                          # 安全配置
 
 ```bash
 # 运行测试
-cd SmartAIProxy.Tests
-dotnet test
+dotnet test SmartAIProxy.Tests
 
 # 收集代码覆盖率
-dotnet test --collect:"XPlat Code Coverage"
+dotnet test SmartAIProxy.Tests --collect:"XPlat Code Coverage"
 ```
 
 测试覆盖：

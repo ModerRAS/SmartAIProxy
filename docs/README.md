@@ -4,8 +4,10 @@
 
 ### 项目背景与目标
 
-请用 Go 语言实现一个高性能、可扩展的 AI API 中转服务，支持主流 AI 模型（如 OpenAI、Anthropic Claude、Google Gemini、Aspects 等）的 API 请求转发。  
+SmartAIProxy 是一个高性能、可扩展的 AI API 中转服务，支持主流 AI 模型（如 OpenAI、Anthropic Claude、Google Gemini、Aspects 等）的 API 请求转发。
 服务需智能选择最省钱、最优质的渠道商，自动应对免费额度、付费价格、特殊时段折扣等复杂场景，提升资金利用率和服务稳定性。
+
+该项目现已使用 .NET 9 重新实现，项目结构已优化，所有代码位于根目录。
 
 ---
 
@@ -23,12 +25,14 @@
 
 ### 技术选型建议
 
-- 后端语言：Go
-- 表达式引擎：govaluate 或 expr
+- 后端语言：C# (.NET 9)
+- Web框架：ASP.NET Core 9.0
+- 表达式引擎：NCalc
 - 配置管理：YAML/JSON 文件
 - 监控与统计：Prometheus、Grafana
-- API 网关：Gin、Echo
-- 单元测试：Go 原生 testing 框架
+- 日志系统：Serilog
+- 容错处理：Polly
+- 单元测试：xUnit.net
 
 ---
 
@@ -109,22 +113,21 @@ monitor:
 
 ### 启动指示
 
-1. **安装 Go 环境**
-   - 推荐使用 Go 1.20 及以上版本。
-   - Windows 用户可从 [Go 官网](https://go.dev/dl/)下载安装包。
-   - 安装后，配置好环境变量 `GOPATH` 和 `GOROOT`。
+1. **安装 .NET 环境**
+   - 推荐使用 .NET 9 SDK。
+   - 可从 [.NET 官网](https://dotnet.microsoft.com/download/dotnet/9.0)下载安装包。
+   - 安装后，使用 `dotnet --version` 确认安装成功。
 
-2. **依赖安装**
-   - 使用 `go mod init` 初始化项目。
-   - 使用 `go get` 安装所需依赖（如 gin、govaluate、expr、prometheus 等）。
+2. **构建项目**
+   - 使用 `dotnet build` 构建整个解决方案。
+   - 所有依赖项会自动从 NuGet 恢复。
 
-3. **编写单元测试**
-   - 所有核心模块需编写单元测试，覆盖主要逻辑和异常处理。
-   - 使用 Go 原生 `testing` 框架，测试文件以 `_test.go` 结尾。
+3. **运行单元测试**
+   - 使用 `dotnet test SmartAIProxy.Tests` 运行所有测试。
    - 确保测试覆盖率高，所有测试通过后再提交代码。
 
 4. **启动服务**
-   - 使用 `go run main.go` 或编译后 `./yourapp` 启动服务。
+   - 使用 `dotnet run --project SmartAIProxy` 启动服务。
    - 服务启动后，监听配置文件中的端口，支持 API 请求转发和管理后台。
 
 5. **提交要求**
@@ -135,12 +138,12 @@ monitor:
 
 ### 自动编程提示词（Prompt）
 
-&gt; 请用 Go 语言实现一个高性能的 AI API 中转服务，支持 OpenAI、Anthropic Claude、Google Gemini 等主流模型的 API 请求转发。  
-&gt; 服务需支持多渠道商配置、复杂规则表达（如 govaluate/expr），智能选择最省钱的渠道，优先用免费额度、特殊时段折扣，自动统计和切换。  
+&gt; 请用 C# (.NET 9) 实现一个高性能的 AI API 中转服务，支持 OpenAI、Anthropic Claude、Google Gemini 等主流模型的 API 请求转发。  
+&gt; 服务需支持多渠道商配置、复杂规则表达（如 NCalc），智能选择最省钱的渠道，优先用免费额度、特殊时段折扣，自动统计和切换。  
 &gt; 保证 API 行为与官方一致，错误原样返回，下游不会因模型意外中断而崩溃。  
 &gt; 配置文件采用 YAML/JSON，规则用表达式字段。  
 &gt; 支持自动重试、标准错误响应、热更新、监控统计、日志、管理后台等功能。  
-&gt; 推荐使用 Gin/Echo 框架，govaluate/expr 表达式引擎，Prometheus 监控。  
+&gt; 推荐使用 ASP.NET Core 框架，NCalc 表达式引擎，Prometheus 监控，Serilog 日志，Polly 容错处理。  
 &gt; 编写完善的单元测试，确保所有测试通过后再提交。  
 &gt; 请输出项目结构、核心代码、配置示例、启动说明和关键实现思路。
 

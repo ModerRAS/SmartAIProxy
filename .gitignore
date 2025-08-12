@@ -1,51 +1,80 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
+# .NET
+bin/
+obj/
+*.pdb
 *.dll
-*.so
-*.dylib
-smartaiproxy
+*.exe
+*.exe.config
+*.log
 
-# Test binary, built with go test -c
-*.test
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 
-# Output of the go coverage tool
-*.out
+# MSTest
+*.vsmdi
+*.testsettings
+*.ordertestsettings
 
-# Dependency directories
-vendor/
-Godeps/
-
-# IDE and editor files
-.vscode/
+# JetBrains
 .idea/
-*.swp
-*.swo
+*.iml
+
+# Rider
+*.iml
+.idea/
+
+# Build files
+*.cache
+*.nupkg
+*.snupkg
+*.vspscc
+*.vssscc
+*.orig
+*.userprops
+
+# macOS
+.DS_Store
+
+# Linux
 *~
 
-# Environment files
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# .env files
 .env
 .env.local
 .env.production
+.env.development
 
-# Log files
+# Logs
 logs/
 *.log
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Node modules (if any frontend)
+node_modules/
 
-# Build artifacts
-bin/
-dist/
-build/
+# Docker
+.dockerignore
 
 # Temporary files
 *.tmp
 *.temp
+
+# .NET specific
+dotnet-publish/
+publish/
+*.user
+*.sln
+*.vspscc
+*.vssscc
+*.vsconfig
+*.csproj.user
+*.csproj.vspscc
