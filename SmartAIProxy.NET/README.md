@@ -1,6 +1,12 @@
 # SmartAIProxy .NET 9 Implementation
 
+[![.NET 9](https://img.shields.io/badge/.NET-9.0-blue)](https://dotnet.microsoft.com/download/dotnet/9.0)
+[![Build Status](https://github.com/ModerRAS/SmartAIProxy/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/ModerRAS/SmartAIProxy/actions)
+[![License](https://img.shields.io/github/license/ModerRAS/SmartAIProxy)](LICENSE)
+
 This is a complete .NET 9 implementation of the SmartAIProxy, a high-performance, extensible AI API gateway service that forwards API requests to major AI models (OpenAI, Anthropic Claude, Google Gemini, etc.). 
+
+[中文文档](README_zh.md) 
 
 ## Features
 
