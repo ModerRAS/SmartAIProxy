@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-SmartAIProxy is a high-performance, extensible AI API gateway service that forwards API requests to major AI models (OpenAI, Anthropic Claude, Google Gemini, etc.). This document specifies the requirements for porting the existing Go implementation to .NET 9 with ASP.NET Core while maintaining full functionality and API compatibility.
+SmartAIProxy is a high-performance, extensible AI API gateway service that forwards API requests to major AI models (OpenAI, Anthropic Claude, Google Gemini, etc.). This document specifies the requirements for porting the existing implementation to .NET 9 with ASP.NET Core while maintaining full functionality and API compatibility.
 
 ## 2. Functional Requirements
 
@@ -112,7 +112,7 @@ SmartAIProxy is a high-performance, extensible AI API gateway service that forwa
 - **NF24** Automated testing with high coverage (>90%)
 
 ### 3.5 Compatibility
-- **NF25** API compatibility with existing Go version
+- **NF25** API compatibility with existing original version
 - **NF26** Support standard HTTP/HTTPS protocols
 - **NF27** Cross-platform deployment (Windows, Linux, macOS)
 - **NF28** Docker container support
@@ -167,7 +167,7 @@ SmartAIProxy is a high-performance, extensible AI API gateway service that forwa
 
 ### 6.1 Gateway API
 - **A01** Maintain exact path compatibility: `/v1/:model/*action`
-- **A02** Support same HTTP methods as Go version
+- **A02** Support same HTTP methods as original version
 - **A03** Preserve request/response headers and content
 - **A04** Return identical error response formats
 - **A05** Support streaming responses for chat completions

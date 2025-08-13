@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Moq;
 using SmartAIProxy.Core.Config;
 using SmartAIProxy.Models.Config;

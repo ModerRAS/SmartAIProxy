@@ -4,76 +4,68 @@
 
 ```
 SmartAIProxy/
-├── tests/
-│   ├── unit/                     # 单元测试
-│   │   ├── config/
-│   │   │   ├── config_test.go
-│   │   │   └── config_suite_test.go
-│   │   ├── gateway/
-│   │   │   ├── gateway_test.go
-│   │   │   ├── proxy_handler_test.go
-│   │   │   └── forward_request_test.go
-│   │   ├── router/
-│   │   │   ├── router_test.go
-│   │   │   ├── selection_test.go
-│   │   │   └── rules_test.go
-│   │   ├── admin/
-│   │   │   ├── admin_test.go
-│   │   │   └── handlers_test.go
-│   │   ├── monitor/
-│   │   │   ├── monitor_test.go
-│   │   │   └── metrics_test.go
-│   │   ├── fault/
-│   │   │   ├── fault_test.go
-│   │   │   └── tolerance_test.go
-│   │   ├── security/
-│   │   │   ├── auth_test.go
-│   │   │   ├── audit_test.go
-│   │   │   └── limiter_test.go
-│   │   ├── logger/
-│   │   │   └── logger_test.go
-│   │   └── provider/
-│   │       └── provider_test.go
-│   ├── integration/              # 集成测试
-│   │   ├── server/
-│   │   │   ├── server_startup_test.go
-│   │   │   ├── config_reload_test.go
-│   │   │   └── graceful_shutdown_test.go
-│   │   ├── api/
-│   │   │   ├── complete_flow_test.go
-│   │   │   ├── channel_switching_test.go
-│   │   │   └── error_handling_test.go
-│   │   ├── fault_tolerance/
-│   │   │   ├── circuit_breaker_test.go
-│   │   │   ├── retry_mechanism_test.go
-│   │   │   └── failover_test.go
-│   │   └── performance/
-│   │       ├── concurrency_test.go
-│   │       ├── memory_test.go
-│   │       └── load_test.go
-│   ├── e2e/                       # 端到端测试
-│   │   ├── basic_forwarding_test.go
-│   │   ├── rule_selection_test.go
-│   │   ├── hot_update_test.go
-│   │   └── stress_test.go
-│   ├── fixtures/                  # 测试数据
-│   │   ├── config/
+├── Tests/
+│   ├── Unit/                     # 单元测试
+│   │   ├── Config/
+│   │   │   ├── ConfigModelTests.cs
+│   │   │   └── ConfigurationServiceTests.cs
+│   │   ├── Controllers/
+│   │   │   ├── AuthControllerTests.cs
+│   │   │   ├── AdminControllerTests.cs
+│   │   │   └── HealthControllerTests.cs
+│   │   ├── Core/
+│   │   │   ├── Channels/
+│   │   │   ├── Config/
+│   │   │   ├── Providers/
+│   │   │   └── Rules/
+│   │   │       └── RuleEngineTests.cs
+│   │   ├── Middleware/
+│   │   │   └── ProxyMiddlewareTests.cs
+│   │   └── Models/
+│   │       ├── Channels/
+│   │       ├── Config/
+│   │       ├── DTO/
+│   │       └── Rules/
+│   ├── Integration/              # 集成测试
+│   │   ├── Server/
+│   │   │   ├── ServerStartupTests.cs
+│   │   │   ├── ConfigReloadTests.cs
+│   │   │   └── GracefulShutdownTests.cs
+│   │   ├── Api/
+│   │   │   ├── CompleteFlowTests.cs
+│   │   │   ├── ChannelSwitchingTests.cs
+│   │   │   └── ErrorHandlingTests.cs
+│   │   ├── FaultTolerance/
+│   │   │   ├── CircuitBreakerTests.cs
+│   │   │   ├── RetryMechanismTests.cs
+│   │   │   └── FailoverTests.cs
+│   │   └── Performance/
+│   │       ├── ConcurrencyTests.cs
+│   │       ├── MemoryTests.cs
+│   │       └── LoadTests.cs
+│   ├── E2E/                       # 端到端测试
+│   │   ├── BasicForwardingTests.cs
+│   │   ├── RuleSelectionTests.cs
+│   │   ├── HotUpdateTests.cs
+│   │   └── StressTests.cs
+│   ├── Fixtures/                  # 测试数据
+│   │   ├── Config/
 │   │   │   ├── valid_config.yaml
 │   │   │   ├── invalid_config.yaml
 │   │   │   └── complex_config.yaml
-│   │   ├── mock_servers/
-│   │   │   ├── openai_mock.go
-│   │   │   ├── claude_mock.go
-│   │   │   └── generic_ai_mock.go
-│   │   └── test_data/
+│   │   ├── MockServers/
+│   │   │   ├── OpenAIMockServer.cs
+│   │   │   ├── ClaudeMockServer.cs
+│   │   │   └── GenericAIMockServer.cs
+│   │   └── TestData/
 │   │       ├── providers.yaml
 │   │       ├── rules.yaml
 │   │       └── api_responses.yaml
-│   └── tools/                     # 测试工具
-│       ├── mock_factory.go
-│       ├── test_server.go
-│       ├── http_client.go
-│       └── benchmark_runner.go
+│   └── Tools/                     # 测试工具
+│       ├── MockFactory.cs
+│       ├── TestServer.cs
+│       ├── HttpClientWrapper.cs
+│       └── BenchmarkRunner.cs
 └── .github/
     └── workflows/
         ├── ci.yml
@@ -86,77 +78,161 @@ SmartAIProxy/
 ### 1. 测试基础设施
 
 #### Mock服务器工厂
-```go
-// tests/tools/mock_factory.go
-type MockServerFactory struct {
-    servers map[string]*httptest.Server
+```csharp
+// Tests/Tools/MockFactory.cs
+public class MockServerFactory : IDisposable
+{
+    private readonly Dictionary<string, TestServer> _servers;
+    
+    public MockServerFactory()
+    {
+        _servers = new Dictionary<string, TestServer>();
+    }
+    
+    public TestServer CreateOpenAIMock();
+    public TestServer CreateClaudeMock();
+    public TestServer CreateErrorMock(double errorRate);
+    public void Cleanup();
+    
+    public void Dispose()
+    {
+        Cleanup();
+    }
 }
-
-func NewMockServerFactory() *MockServerFactory
-func (f *MockServerFactory) CreateOpenAIMock() *httptest.Server
-func (f *MockServerFactory) CreateClaudeMock() *httptest.Server
-func (f *MockServerFactory) CreateErrorMock(errorRate float64) *httptest.Server
-func (f *MockServerFactory) Cleanup()
 ```
 
 #### 测试HTTP客户端
-```go
-// tests/tools/http_client.go
-type TestHTTPClient struct {
-    client *http.Client
-    baseURL string
+```csharp
+// Tests/Tools/HttpClientWrapper.cs
+public class HttpClientWrapper : IDisposable
+{
+    private readonly HttpClient _client;
+    private readonly string _baseURL;
+    
+    public HttpClientWrapper(string baseURL)
+    {
+        _baseURL = baseURL;
+        _client = new HttpClient();
+    }
+    
+    public async Task<HttpResponseMessage> GetAsync(string path, Dictionary<string, string> headers = null);
+    public async Task<HttpResponseMessage> PostAsync(string path, object body, Dictionary<string, string> headers = null);
+    public HttpClientWrapper WithTimeout(TimeSpan timeout);
+    
+    public void Dispose()
+    {
+        _client?.Dispose();
+    }
 }
-
-func NewTestHTTPClient(baseURL string) *TestHTTPClient
-func (c *TestHTTPClient) Get(path string, headers map[string]string) (*http.Response, error)
-func (c *TestHTTPClient) Post(path string, body interface{}, headers map[string]string) (*http.Response, error)
-func (c *TestHTTPClient) WithTimeout(timeout time.Duration) *TestHTTPClient
 ```
 
 #### 基准测试运行器
-```go
-// tests/tools/benchmark_runner.go
-type BenchmarkRunner struct {
-    concurrency int
-    duration    time.Duration
-    requests    int
+```csharp
+// Tests/Tools/BenchmarkRunner.cs
+public class BenchmarkRunner
+{
+    public int Concurrency { get; set; }
+    public TimeSpan Duration { get; set; }
+    public int Requests { get; set; }
+    
+    public BenchmarkRunner()
+    {
+        Concurrency = 1;
+        Duration = TimeSpan.FromSeconds(30);
+        Requests = 1000;
+    }
+    
+    public BenchmarkResult RunBenchmark(Func<HttpContext, Task> handler);
+    public BenchmarkResult RunConcurrentTest(Func<HttpContext, Task> handler);
 }
-
-func NewBenchmarkRunner() *BenchmarkRunner
-func (r *BenchmarkRunner) RunBenchmark(handler http.Handler) *BenchmarkResult
-func (r *BenchmarkRunner) RunConcurrentTest(handler http.Handler) *BenchmarkResult
 ```
 
 ### 2. 测试框架扩展
 
 #### 增强的测试套件
-```go
-// tests/tools/test_suite.go
-type APITestSuite struct {
-    suite.Suite
-    config     *config.Config
-    mockServer *httptest.Server
-    httpClient *TestHTTPClient
+```csharp
+// Tests/Tools/APITestSuite.cs
+public class APITestSuite : IDisposable
+{
+    protected IConfiguration Config { get; private set; }
+    protected TestServer MockServer { get; private set; }
+    protected HttpClientWrapper HttpClient { get; private set; }
+    protected IServiceProvider Services { get; private set; }
+    
+    [TestInitialize]
+    public virtual void Setup()
+    {
+        // 初始化测试环境
+        var builder = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.Testing.json")
+            .AddEnvironmentVariables();
+            
+        Config = builder.Build();
+        
+        // 设置测试服务
+        var services = new ServiceCollection();
+        ConfigureServices(services);
+        
+        Services = services.BuildServiceProvider();
+        
+        // 初始化HTTP客户端
+        HttpClient = new HttpClientWrapper("http://localhost");
+    }
+    
+    [TestCleanup]
+    public virtual void Cleanup()
+    {
+        HttpClient?.Dispose();
+        MockServer?.Dispose();
+        Services?.Dispose();
+    }
+    
+    protected virtual void ConfigureServices(IServiceCollection services)
+    {
+        // 配置测试服务
+    }
+    
+    public void Dispose()
+    {
+        Cleanup();
+    }
 }
-
-func (s *APITestSuite) SetupSuite()
-func (s *APITestSuite) SetupTest()
-func (s *APITestSuite) TearDownTest()
-func (s *APITestSuite) TearDownSuite()
 ```
 
 #### 响应断言助手
-```go
-// tests/tools/assertions.go
-type HTTPAssertions struct {
-    suite *suite.Suite
+```csharp
+// Tests/Tools/HTTPAssertions.cs
+public static class HTTPAssertions
+{
+    public static void ShouldHaveStatus(this HttpResponseMessage response, int expectedStatusCode)
+    {
+        Assert.AreEqual(expectedStatusCode, (int)response.StatusCode,
+            $"Expected status code {expectedStatusCode}, but got {(int)response.StatusCode}");
+    }
+    
+    public static void ShouldContainHeader(this HttpResponseMessage response, string key, string expectedValue)
+    {
+        Assert.IsTrue(response.Headers.Contains(key), $"Header '{key}' not found");
+        var values = response.Headers.GetValues(key);
+        Assert.IsTrue(values.Contains(expectedValue),
+            $"Header '{key}' does not contain value '{expectedValue}'");
+    }
+    
+    public static async Task ShouldHaveJSONBody<T>(this HttpResponseMessage response, T expected)
+    {
+        var content = await response.Content.ReadAsStringAsync();
+        var actual = JsonConvert.DeserializeObject<T>(content);
+        Assert.AreEqual(expected, actual);
+    }
+    
+    public static void ShouldHaveErrorRate(this List<HttpResponseMessage> responses, double maxErrorRate)
+    {
+        var errorCount = responses.Count(r => !r.IsSuccessStatusCode);
+        var actualErrorRate = (double)errorCount / responses.Count;
+        Assert.IsTrue(actualErrorRate <= maxErrorRate,
+            $"Error rate {actualErrorRate:P} exceeds maximum allowed {maxErrorRate:P}");
+    }
 }
-
-func NewHTTPAssertions(suite *suite.Suite) *HTTPAssertions
-func (a *HTTPAssertions) ShouldHaveStatus(resp *http.Response, expected int)
-func (a *HTTPAssertions) ShouldContainHeader(resp *http.Response, key, expected string)
-func (a *HTTPAssertions) ShouldHaveJSONBody(resp *http.Response, expected interface{})
-func (a *HTTPAssertions) ShouldHaveErrorRate(results []*http.Response, maxErrorRate float64)
 ```
 
 ## 测试数据管理
@@ -240,35 +316,107 @@ rules:
 ### 2. Mock服务配置
 
 #### OpenAI Mock服务
-```go
-// tests/fixtures/mock_servers/openai_mock.go
-type OpenAIMockServer struct {
-    *httptest.Server
-    calls        []APICall
-    shouldError  bool
-    delay        time.Duration
+```csharp
+// Tests/Fixtures/MockServers/OpenAIMockServer.cs
+public class OpenAIMockServer : IDisposable
+{
+    private readonly TestServer _server;
+    private readonly List<APICall> _calls;
+    private bool _shouldError;
+    private TimeSpan _delay;
+    
+    public OpenAIMockServer()
+    {
+        _calls = new List<APICall>();
+        _shouldError = false;
+        _delay = TimeSpan.Zero;
+        
+        var builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton(this);
+        
+        var app = builder.Build();
+        ConfigureMockEndpoints(app);
+        
+        _server = new TestServer(app);
+    }
+    
+    public OpenAIMockServer ShouldError(bool enabled)
+    {
+        _shouldError = enabled;
+        return this;
+    }
+    
+    public OpenAIMockServer WithDelay(TimeSpan delay)
+    {
+        _delay = delay;
+        return this;
+    }
+    
+    public int GetCallCount() => _calls.Count;
+    
+    public void Reset() => _calls.Clear();
+    
+    private void ConfigureMockEndpoints(WebApplication app)
+    {
+        // 配置Mock端点
+    }
+    
+    public void Dispose()
+    {
+        _server?.Dispose();
+    }
 }
-
-func NewOpenAIMockServer() *OpenAIMockServer
-func (s *OpenAIMockServer) ShouldError(enabled bool) *OpenAIMockServer
-func (s *OpenAIMockServer) WithDelay(delay time.Duration) *OpenAIMockServer
-func (s *OpenAIMockServer) GetCallCount() int
-func (s *OpenAIMockServer) Reset()
 ```
 
 #### Claude Mock服务
-```go
-// tests/fixtures/mock_servers/claude_mock.go
-type ClaudeMockServer struct {
-    *httptest.Server
-    responses map[string]string
-    errorRate float64
+```csharp
+// Tests/Fixtures/MockServers/ClaudeMockServer.cs
+public class ClaudeMockServer : IDisposable
+{
+    private readonly TestServer _server;
+    private readonly Dictionary<string, string> _responses;
+    private double _errorRate;
+    
+    public ClaudeMockServer()
+    {
+        _responses = new Dictionary<string, string>();
+        _errorRate = 0.0;
+        
+        var builder = WebApplication.CreateBuilder();
+        builder.Services.AddSingleton(this);
+        
+        var app = builder.Build();
+        ConfigureMockEndpoints(app);
+        
+        _server = new TestServer(app);
+    }
+    
+    public void SetResponse(string endpoint, string response)
+    {
+        _responses[endpoint] = response;
+    }
+    
+    public void SetErrorRate(double rate)
+    {
+        _errorRate = rate;
+    }
+    
+    public int GetRequestCount()
+    {
+        // 返回请求计数
+        return 0;
+    }
+    
+    private void ConfigureMockEndpoints(WebApplication app)
+    {
+        // 配置Mock端点
+    }
+    
+    public void Dispose()
+    {
+        _server?.Dispose();
+    }
 }
-
-func NewClaudeMockServer() *ClaudeMockServer
-func (s *ClaudeMockServer) SetResponse(endpoint, response string)
-func (s *ClaudeMockServer) SetErrorRate(rate float64)
-func (s *ClaudeMockServer) GetRequestCount() int
 ```
 
 ## 测试执行策略
@@ -276,43 +424,43 @@ func (s *ClaudeMockServer) GetRequestCount() int
 ### 1. 单元测试执行
 ```bash
 # 运行所有单元测试
-go test ./tests/unit/... -v -cover
+dotnet test --filter "TestCategory!=Integration&TestCategory!=E2E" --verbosity normal --collect:"XPlat Code Coverage"
 
 # 运行特定模块单元测试
-go test ./tests/unit/gateway -v -coverprofile=gateway_coverage.out
+dotnet test Tests/Unit/ --verbosity normal --collect:"XPlat Code Coverage" --results-directory TestResults
 
 # 生成覆盖率报告
-go tool cover -html=gateway_coverage.out -o coverage.html
+dotnet reportgenerator -reports:TestResults/coverage.xml -targetdir:CoverageReport -reporttypes:Html
 ```
 
 ### 2. 集成测试执行
 ```bash
 # 运行集成测试
-go test ./tests/integration/... -v -tags=integration
+dotnet test --filter "TestCategory=Integration" --verbosity normal
 
 # 运行服务启动集成测试
-go test ./tests/integration/server -v -run TestServerStartup
+dotnet test --filter "TestCategory=Integration&DisplayName~ServerStartup" --verbosity normal
 
 # 运行API完整流程测试
-go test ./tests/integration/api -v -run TestAPICompleteFlow
+dotnet test --filter "TestCategory=Integration&DisplayName~CompleteFlow" --verbosity normal
 ```
 
 ### 3. 端到端测试执行
 ```bash
 # 运行E2E测试
-go test ./tests/e2e/... -v -tags=e2e
+dotnet test --filter "TestCategory=E2E" --verbosity normal
 
 # 运行基准测试
-go test ./tests/integration/performance -v -bench=. -benchmem
+dotnet run --project Tests/Benchmark --configuration Release
 ```
 
 ### 4. 性能测试执行
 ```bash
 # 运行并发测试
-go test -race ./tests/integration/performance
+dotnet test --filter "TestCategory=Performance" --verbosity normal
 
 # 运行内存分析测试
-go test -cpuprofile=cpu.out -memprofile=mem.out ./tests/integration/performance
+dotnet test --filter "TestCategory=Performance" --verbosity normal --collect:"XPlat Code Coverage" --settings:coverlet.runsettings
 ```
 
 ## CI/CD 集成设计
@@ -337,21 +485,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       
-      - name: Setup Go
-        uses: actions/setup-go@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          go-version: 1.21
+          dotnet-version: 9.0.x
           
+      - name: Restore dependencies
+        run: dotnet restore
+        
+      - name: Build
+        run: dotnet build --no-restore
+        
       - name: Run Unit Tests
-        run: go test ./... -v -covermode=count -coverprofile=coverage.out
+        run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory TestResults
         
       - name: Run Integration Tests
-        run: go test ./tests/integration/... -v -tags=integration
+        run: dotnet test --no-build --filter "TestCategory=Integration" --verbosity normal
+        
+      - name: Generate Coverage Report
+        run: dotnet reportgenerator -reports:TestResults/coverage.xml -targetdir:CoverageReport -reporttypes:Html
         
       - name: Upload Coverage
         uses: codecov/codecov-action@v3
         with:
-          file: ./coverage.out
+          file: ./TestResults/coverage.xml
 ```
 
 #### 性能监控工作流
@@ -370,14 +527,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         
-      - name: Setup Go
-        uses: actions/setup-go@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 9.0.x
+        
+      - name: Restore dependencies
+        run: dotnet restore
+        
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
         
       - name: Run Benchmark
-        run: go test ./tests/integration/performance -bench=. -benchmem -benchtime=10s
+        run: dotnet run --project Tests/Benchmark --configuration Release
         
       - name: Generate Report
-        run: go tool pprof -text mem.out > memory_report.txt
+        run: dotnet run --project Tools/PerformanceReport --configuration Release
 ```
 
 ### 2. 代码质量门禁
@@ -396,17 +561,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 9.0.x
+        
+      - name: Restore dependencies
+        run: dotnet restore
         
       - name: Test with Coverage
-        run: go test ./... -covermode=count -coverprofile=coverage.out
+        run: dotnet test --no-build --collect:"XPlat Code Coverage" --results-directory TestResults
         
       - name: Check Coverage
         run: |
-          go tool cover -func=coverage.out > coverage.txt
-          TOTAL=$(grep "total:" coverage.txt | awk '{print $3}' | tr -d '%')
-          if [ "$TOTAL" -lt 80 ]; then
-            echo "Coverage below 80%: $TOTAL%"
+          dotnet reportgenerator -reports:TestResults/coverage.xml -targetdir:CoverageReport -reporttypes:Xml
+          COVERAGE=$(grep LineCoverage CoverageReport/coverage.xml | cut -d'"' -f2)
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "Coverage below 80%: $COVERAGE%"
             exit 1
           fi
 ```

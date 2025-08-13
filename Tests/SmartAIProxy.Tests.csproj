@@ -17,11 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmartAIProxy\SmartAIProxy.csproj" />
+    <ProjectReference Include="..\SmartAIProxy.csproj" />
   </ItemGroup>
 
 </Project>

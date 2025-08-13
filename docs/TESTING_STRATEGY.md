@@ -85,80 +85,127 @@
 ### 单元测试用例
 
 #### 1. Gateway模块测试
-```go
+```csharp
 // TestProxyHandler 完整API转发测试
-TestProxyHandler_BasicForward()
-TestProxyHandler_ChannelSelection()
-TestProxyHandler_ErrorHandling()
-TestProxyHandler_TimeoutHandling()
-TestProxyHandler_MetricCollection()
+[Test]
+public async Task ProxyHandler_BasicForward()
+
+[Test]
+public async Task ProxyHandler_ChannelSelection()
+
+[Test]
+public async Task ProxyHandler_ErrorHandling()
+
+[Test]
+public async Task ProxyHandler_TimeoutHandling()
+
+[Test]
+public async Task ProxyHandler_MetricCollection()
 
 // TestForwardRequest 函数级别的测试
-TestForwardRequest_Successful()
-TestForwardRequest_Timeout()
-TestForwardRequest_Retry()
-TestForwardRequest_MetricRecording()
+[Test]
+public async Task ForwardRequest_Successful()
+
+[Test]
+public async Task ForwardRequest_Timeout()
+
+[Test]
+public async Task ForwardRequest_Retry()
+
+[Test]
+public async Task ForwardRequest_MetricRecording()
 ```
 
 #### 2. 规则引擎测试
-```go
-TestRouter_SelectBestProvider_ComplexRules()
-TestRouter_SelectBestProvider_EmptyProviders()
-TestRouter_SelectBestProvider_AllInactive()
-TestRouter_SelectBestProvider_PriorityLogic()
+```csharp
+[Test]
+public async Task Router_SelectBestProvider_ComplexRules()
+
+[Test]
+public async Task Router_SelectBestProvider_EmptyProviders()
+
+[Test]
+public async Task Router_SelectBestProvider_AllInactive()
+
+[Test]
+public async Task Router_SelectBestProvider_PriorityLogic()
 ```
 
 #### 3. 配置热更新测试
-```go
-TestConfig_HotReload()
-TestConfig_InvalidUpdate()
-TestConfig_ComplexRules_Update()
+```csharp
+[Test]
+public async Task Config_HotReload()
+
+[Test]
+public async Task Config_InvalidUpdate()
+
+[Test]
+public async Task Config_ComplexRules_Update()
 ```
 
 ### 集成测试用例
 
 #### 1. 服务启动流程
-```go
-TestServerStartup_Success()
-TestServerStartup_InvalidConfig()
-TestServerStartup_PortConflict()
+```csharp
+[Test]
+public async Task ServerStartup_Success()
+
+[Test]
+public async Task ServerStartup_InvalidConfig()
+
+[Test]
+public async Task ServerStartup_PortConflict()
 ```
 
 #### 2. API转发集成
-```go
-TestAPICompleteFlow()
-TestAPI_RoundRobinSelection()
-TestAPI_QuotaExhaustion()
-TestAPI_CircuitBreaker()
+```csharp
+[Test]
+public async Task APICompleteFlow()
+
+[Test]
+public async Task API_RoundRobinSelection()
+
+[Test]
+public async Task API_QuotaExhaustion()
+
+[Test]
+public async Task API_CircuitBreaker()
 ```
 
 #### 3. 故障容错测试
-```go
-TestFaultTolerance_SingleProviderFail()
-TestFaultTolerance_MultipleProviderFail()
-TestFaultTolerance_RetrySuccess()
-TestFaultTolerance_CircuitOpenClose()
+```csharp
+[Test]
+public async Task FaultTolerance_SingleProviderFail()
+
+[Test]
+public async Task FaultTolerance_MultipleProviderFail()
+
+[Test]
+public async Task FaultTolerance_RetrySuccess()
+
+[Test]
+public async Task FaultTolerance_CircuitOpenClose()
 ```
 
 ## 测试工具和技术
 
 ### 单元测试工具
-- **测试框架**: Go标准testing包
-- **断言库**: testify/assert, require
-- **Mock框架**: testify/mock, gomock
-- **覆盖率**: go tool cover
+- **测试框架**: xUnit.net / NUnit / MSTest
+- **断言库**: FluentAssertions, Assert
+- **Mock框架**: Moq, NSubstitute
+- **覆盖率**: Coverlet, dotCover
 
 ### 集成测试工具
-- **HTTP测试**: httptest, httpmock
-- **服务测试**: testify/suite
-- **数据库测试**: 内存配置
-- **并发测试**: go test -race
+- **HTTP测试**: Microsoft.AspNetCore.Mvc.Testing
+- **服务测试**: TestServer, WebApplicationFactory
+- **数据库测试**: 内存配置, Testcontainers
+- **并发测试**: xUnit并行测试
 
 ### 性能测试工具
-- **Benchmark**: go test -bench
-- **压力测试**: vegeta
-- **内存分析**: go tool pprof
-- **并发测试**: go test -race
+- **Benchmark**: BenchmarkDotNet
+- **压力测试**: k6, wrk
+- **内存分析**: dotMemory, Visual Studio Diagnostic Tools
+- **并发测试**: xUnit并行测试
 
 ### 端到端测试工具
 - **API测试**: resty, httpie
@@ -169,32 +216,38 @@ TestFaultTolerance_CircuitOpenClose()
 ## 测试数据管理
 
 ### Mock数据生成
-```go
+```csharp
 // 配置测试数据
-testConfig := &config.Config{
-    Server: config.ServerConfig{
-        Listen:         "0.0.0.0:8080",
-        Timeout:        30,
-        MaxConnections: 100,
+var testConfig = new Config
+{
+    Server = new ServerConfig
+    {
+        Listen = "0.0.0.0:8080",
+        Timeout = 30,
+        MaxConnections = 100,
     },
-    Channels: []config.ChannelConfig{
+    Channels = new List<ChannelConfig>
+    {
+        new ChannelConfig
         {
-            Name:      "测试渠道1",
-            Type:      "openai",
-            Endpoint:  "http://localhost:3000",
-            APIKey:    "test-key-1",
-            Price:     0.01,
-            Priority:  1,
+            Name = "测试渠道1",
+            Type = "openai",
+            Endpoint = "http://localhost:3000",
+            ApiKey = "test-key-1",
+            PricePerToken = 0.01m,
+            Priority = 1,
         },
     },
-    Rules: []config.RuleConfig{
+    Rules = new List<RuleConfig>
+    {
+        new RuleConfig
         {
-            Name:       "简单规则",
-            Channel:    "测试渠道1",
-            Expression: "true",
+            Name = "简单规则",
+            Channel = "测试渠道1",
+            Expression = "true",
         },
     },
-}
+};
 ```
 
 ### 测试隔离策略

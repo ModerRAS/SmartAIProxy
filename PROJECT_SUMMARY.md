@@ -12,7 +12,7 @@ SmartAIProxy是一个高性能、可扩展的AI API中转服务，支持主流AI
 - 动态管理渠道商配置
 
 ### 2. 智能路由与资金优化
-- 基于govaluate表达式的复杂规则系统
+- 基于NCalc表达式的复杂规则系统
 - 自动选择最省钱、最优质的渠道商
 - 优先使用免费额度和特殊时段折扣
 - 支持规则优先级和嵌套组合
@@ -56,12 +56,12 @@ SmartAIProxy是一个高性能、可扩展的AI API中转服务，支持主流AI
 - **Logger**: 日志系统，结构化日志输出
 
 ### 技术栈
-- **语言**: Go 1.20+
-- **框架**: Gin (Web框架)
-- **表达式引擎**: govaluate
+- **语言**: C# / .NET 9
+- **框架**: ASP.NET Core (Web框架)
+- **表达式引擎**: NCalc
 - **监控**: Prometheus + Grafana
 - **配置**: YAML/JSON文件
-- **测试**: Go原生testing框架
+- **测试**: xUnit / NUnit / MSTest
 
 ## 配置说明
 
@@ -141,7 +141,7 @@ rules:
 ## 部署与运行
 
 ### 环境要求
-- Go 1.20或更高版本
+- .NET 9 SDK或更高版本
 - Linux/macOS/Windows系统
 
 ### 构建步骤
@@ -150,14 +150,14 @@ rules:
 git clone <repository-url>
 cd SmartAIProxy
 
-# 安装依赖
-go mod tidy
+# 还原依赖
+dotnet restore
 
 # 构建应用
-go build -o smartaiproxy main.go
+dotnet build --configuration Release
 
 # 运行服务
-./smartaiproxy
+dotnet run --configuration Release
 ```
 
 ### 配置文件
@@ -170,10 +170,10 @@ go build -o smartaiproxy main.go
 
 ```bash
 # 运行所有测试
-go test ./... -v
+dotnet test --verbosity normal
 
 # 运行特定模块测试
-go test ./internal/router -v
+dotnet test Tests/Unit/ --verbosity normal
 ```
 
 ### 集成测试
@@ -186,7 +186,7 @@ go test ./internal/router -v
 ## 项目特点
 
 ### 优势
-1. **高性能**: 基于Go语言开发，支持高并发处理
+1. **高性能**: 基于.NET 9开发，支持高并发处理
 2. **智能化**: 复杂规则引擎，自动选择最优渠道
 3. **高可用**: 完善的容错和重试机制
 4. **易扩展**: 模块化设计，便于功能扩展
