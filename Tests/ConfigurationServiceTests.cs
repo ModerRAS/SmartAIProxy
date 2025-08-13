@@ -11,6 +11,10 @@ using Xunit;
 
 namespace SmartAIProxy.Tests.Core;
 
+/// <summary>
+/// 配置服务测试类
+/// 用于验证配置服务的加载、保存、重载和线程安全功能
+/// </summary>
 public class ConfigurationServiceTests
 {
     private readonly Mock<ILogger<ConfigurationService>> _mockLogger;
@@ -18,12 +22,16 @@ public class ConfigurationServiceTests
     private readonly string _testConfigPath;
     private readonly string _testConfigContent;
 
+    /// <summary>
+    /// 配置服务测试构造函数
+    /// 设置测试环境和测试配置内容
+    /// </summary>
     public ConfigurationServiceTests()
     {
         _mockLogger = new Mock<ILogger<ConfigurationService>>();
         _mockEnv = new Mock<IWebHostEnvironment>();
         
-        // Setup test directory
+        // 设置测试目录
         var testDir = Path.Combine(Path.GetTempPath(), "SmartAIProxyTests");
         if (!Directory.Exists(testDir))
         {
@@ -37,6 +45,7 @@ public class ConfigurationServiceTests
             Directory.CreateDirectory(configDir);
         }
         
+        // 测试配置内容
         _testConfigContent = @"
 server:
   listen: ""0.0.0.0:8080""
@@ -76,16 +85,19 @@ security:
         _mockEnv.Setup(env => env.ContentRootPath).Returns(testDir);
     }
 
+    /// <summary>
+    /// 测试构造函数是否从文件加载配置
+    /// </summary>
     [Fact]
     public void Constructor_LoadsConfigFromFile()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, _testConfigContent);
 
-        // Act
+        // 执行
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
 
-        // Assert
+        // 断言
         var config = configService.GetConfig();
         Assert.Equal("0.0.0.0:8080", config.Server.Listen);
         Assert.Single(config.Channels);
@@ -94,63 +106,75 @@ security:
         Assert.Equal("Test Rule", config.Rules[0].Name);
     }
 
+    /// <summary>
+    /// 测试构造函数在配置文件不存在时是否创建默认配置
+    /// </summary>
     [Fact]
     public void Constructor_CreatesDefaultConfigWhenFileNotExists()
     {
-        // Arrange
+        // 准备
         if (File.Exists(_testConfigPath))
         {
             File.Delete(_testConfigPath);
         }
 
-        // Act
+        // 执行
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
 
-        // Assert
+        // 断言
         var config = configService.GetConfig();
         Assert.NotNull(config);
         Assert.Equal("0.0.0.0:8080", config.Server.Listen);
         Assert.NotEmpty(config.Channels);
     }
 
+    /// <summary>
+    /// 测试GetConfig方法是否返回当前配置
+    /// </summary>
     [Fact]
     public void GetConfig_ReturnsCurrentConfig()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, _testConfigContent);
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
 
-        // Act
+        // 执行
         var config = configService.GetConfig();
 
-        // Assert
+        // 断言
         Assert.Equal("0.0.0.0:8080", config.Server.Listen);
         Assert.Single(config.Channels);
     }
 
+    /// <summary>
+    /// 测试ReloadConfig方法是否从文件重新加载配置
+    /// </summary>
     [Fact]
     public void ReloadConfig_ReloadsConfigFromFile()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, _testConfigContent);
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
         
-        // Modify the config file
+        // 修改配置文件
         var modifiedContent = _testConfigContent.Replace("0.0.0.0:8080", "0.0.0.0:9090");
         File.WriteAllText(_testConfigPath, modifiedContent);
 
-        // Act
+        // 执行
         configService.ReloadConfig();
         var config = configService.GetConfig();
 
-        // Assert
+        // 断言
         Assert.Equal("0.0.0.0:9090", config.Server.Listen);
     }
 
+    /// <summary>
+    /// 测试UpdateConfig方法是否更新并保存配置
+    /// </summary>
     [Fact]
     public void UpdateConfig_UpdatesAndSavesConfig()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, _testConfigContent);
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
         
@@ -163,25 +187,28 @@ security:
             Security = new SecurityConfig()
         };
 
-        // Act
+        // 执行
         configService.UpdateConfig(newConfig);
         var config = configService.GetConfig();
 
-        // Assert
+        // 断言
         Assert.Equal("0.0.0.0:9090", config.Server.Listen);
         Assert.Equal(60, config.Server.Timeout);
         Assert.Equal(2000, config.Server.MaxConnections);
         Assert.False(config.Monitor.Enable);
     }
 
+    /// <summary>
+    /// 测试GetConfig方法是否是线程安全的
+    /// </summary>
     [Fact]
     public void GetConfig_IsThreadSafe()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, _testConfigContent);
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
 
-        // Act
+        // 执行
         var results = new List<AppConfig>();
         var threads = new List<Thread>();
         
@@ -200,7 +227,7 @@ security:
             thread.Join();
         }
 
-        // Assert
+        // 断言
         Assert.Equal(10, results.Count);
         foreach (var result in results)
         {
@@ -208,18 +235,21 @@ security:
         }
     }
 
+    /// <summary>
+    /// 测试ReloadConfig方法是否是线程安全的
+    /// </summary>
     [Fact]
     public void ReloadConfig_IsThreadSafe()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, _testConfigContent);
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
         
-        // Modify the config file
+        // 修改配置文件
         var modifiedContent = _testConfigContent.Replace("0.0.0.0:8080", "0.0.0.0:9090");
         File.WriteAllText(_testConfigPath, modifiedContent);
 
-        // Act
+        // 执行
         var results = new List<AppConfig>();
         var threads = new List<Thread>();
         
@@ -239,7 +269,7 @@ security:
             thread.Join();
         }
 
-        // Assert
+        // 断言
         Assert.Equal(10, results.Count);
         foreach (var result in results)
         {
@@ -247,14 +277,17 @@ security:
         }
     }
 
+    /// <summary>
+    /// 测试UpdateConfig方法是否是线程安全的
+    /// </summary>
     [Fact]
     public void UpdateConfig_IsThreadSafe()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, _testConfigContent);
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
 
-        // Act
+        // 执行
         var results = new List<AppConfig>();
         var threads = new List<Thread>();
         
@@ -284,9 +317,9 @@ security:
             thread.Join();
         }
 
-        // Assert
+        // 断言
         Assert.Equal(10, results.Count);
-        // All configs should have the same final value (the last one updated)
+        // 所有配置应该具有相同的最终值（最后更新的值）
         var finalConfig = results[0];
         foreach (var result in results)
         {
@@ -294,65 +327,77 @@ security:
         }
     }
 
+    /// <summary>
+    /// 测试构造函数是否处理无效的配置文件
+    /// </summary>
     [Fact]
     public void Constructor_HandlesInvalidConfigFile()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, "invalid: yaml: content: [");
 
-        // Act
+        // 执行
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
 
-        // Assert
+        // 断言
         var config = configService.GetConfig();
         Assert.NotNull(config);
-        // Should fall back to default config
+        // 应该回退到默认配置
         Assert.Equal("0.0.0.0:8080", config.Server.Listen);
     }
 
+    /// <summary>
+    /// 测试ReloadConfig方法是否处理无效的配置文件
+    /// </summary>
     [Fact]
     public void ReloadConfig_HandlesInvalidConfigFile()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, _testConfigContent);
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
         
-        // Replace with invalid content
+        // 替换为无效内容
         File.WriteAllText(_testConfigPath, "invalid: yaml: content: [");
 
-        // Act
+        // 执行
         configService.ReloadConfig();
         var config = configService.GetConfig();
 
-        // Assert
-        // Should keep the previous valid config
+        // 断言
+        // 应该保持之前的有效配置
         Assert.Equal("0.0.0.0:8080", config.Server.Listen);
     }
 
+    /// <summary>
+    /// 测试构造函数是否处理空的配置文件
+    /// </summary>
     [Fact]
     public void Constructor_HandlesEmptyConfigFile()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, "");
 
-        // Act
+        // 执行
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
 
-        // Assert
+        // 断言
         var config = configService.GetConfig();
         Assert.NotNull(config);
-        // Should fall back to default config
+        // 应该回退到默认配置
         Assert.Equal("0.0.0.0:8080", config.Server.Listen);
     }
 
+    /// <summary>
+    /// 测试UpdateConfig方法是否处理null配置
+    /// </summary>
     [Fact]
     public void UpdateConfig_HandlesNullConfig()
     {
-        // Arrange
+        // 准备
         File.WriteAllText(_testConfigPath, _testConfigContent);
         var configService = new ConfigurationService(_mockLogger.Object, _mockEnv.Object);
 
-        // Act & Assert
+        // 执行和断言
         Assert.Throws<ArgumentNullException>(() => configService.UpdateConfig(null));
     }
 }

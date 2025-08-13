@@ -5,15 +5,22 @@ using Xunit;
 
 namespace SmartAIProxy.Tests.Models;
 
+/// <summary>
+/// 配置模型测试类
+/// 用于验证所有配置模型的默认值和属性设置功能
+/// </summary>
 public class ConfigModelTests
 {
+    /// <summary>
+    /// 测试AppConfig类的默认值是否正确
+    /// </summary>
     [Fact]
     public void AppConfig_DefaultValues_AreCorrect()
     {
-        // Arrange & Act
+        // 准备和执行
         var config = new AppConfig();
 
-        // Assert
+        // 断言
         Assert.NotNull(config.Server);
         Assert.Equal("0.0.0.0:8080", config.Server.Listen);
         Assert.Equal(30, config.Server.Timeout);
@@ -45,25 +52,31 @@ public class ConfigModelTests
         Assert.Equal(10, config.Security.RateLimit.Burst);
     }
 
+    /// <summary>
+    /// 测试ServerConfig类的默认值是否正确
+    /// </summary>
     [Fact]
     public void ServerConfig_DefaultValues_AreCorrect()
     {
-        // Arrange & Act
+        // 准备和执行
         var serverConfig = new ServerConfig();
 
-        // Assert
+        // 断言
         Assert.Equal("0.0.0.0:8080", serverConfig.Listen);
         Assert.Equal(30, serverConfig.Timeout);
         Assert.Equal(1000, serverConfig.MaxConnections);
     }
 
+    /// <summary>
+    /// 测试ChannelConfig类的默认值是否正确
+    /// </summary>
     [Fact]
     public void ChannelConfig_DefaultValues_AreCorrect()
     {
-        // Arrange & Act
+        // 准备和执行
         var channelConfig = new ChannelConfig();
 
-        // Assert
+        // 断言
         Assert.Equal(string.Empty, channelConfig.Name);
         Assert.Equal("openai", channelConfig.Type);
         Assert.Equal("https://api.openai.com/v1", channelConfig.Endpoint);
@@ -76,81 +89,102 @@ public class ConfigModelTests
         Assert.Empty(channelConfig.ModelMapping);
     }
 
+    /// <summary>
+    /// 测试RuleConfig类的默认值是否正确
+    /// </summary>
     [Fact]
     public void RuleConfig_DefaultValues_AreCorrect()
     {
-        // Arrange & Act
+        // 准备和执行
         var ruleConfig = new RuleConfig();
 
-        // Assert
+        // 断言
         Assert.Equal(string.Empty, ruleConfig.Name);
         Assert.Equal(string.Empty, ruleConfig.Channel);
         Assert.Equal(string.Empty, ruleConfig.Expression);
         Assert.Equal(0, ruleConfig.Priority);
     }
 
+    /// <summary>
+    /// 测试MonitorConfig类的默认值是否正确
+    /// </summary>
     [Fact]
     public void MonitorConfig_DefaultValues_AreCorrect()
     {
-        // Arrange & Act
+        // 准备和执行
         var monitorConfig = new MonitorConfig();
 
-        // Assert
+        // 断言
         Assert.True(monitorConfig.Enable);
         Assert.Equal("0.0.0.0:9100", monitorConfig.PrometheusListen);
     }
 
+    /// <summary>
+    /// 测试SecurityConfig类的默认值是否正确
+    /// </summary>
     [Fact]
     public void SecurityConfig_DefaultValues_AreCorrect()
     {
-        // Arrange & Act
+        // 准备和执行
         var securityConfig = new SecurityConfig();
 
-        // Assert
+        // 断言
         Assert.NotNull(securityConfig.Auth);
         Assert.NotNull(securityConfig.RateLimit);
     }
 
+    /// <summary>
+    /// 测试AuthConfig类的默认值是否正确
+    /// </summary>
     [Fact]
     public void AuthConfig_DefaultValues_AreCorrect()
     {
-        // Arrange & Act
+        // 准备和执行
         var authConfig = new AuthConfig();
 
-        // Assert
+        // 断言
         Assert.NotNull(authConfig.Jwt);
         Assert.NotNull(authConfig.ApiKeys);
         Assert.Empty(authConfig.ApiKeys);
     }
 
+    /// <summary>
+    /// 测试JwtConfig类的默认值是否正确
+    /// </summary>
     [Fact]
     public void JwtConfig_DefaultValues_AreCorrect()
     {
-        // Arrange & Act
+        // 准备和执行
         var jwtConfig = new JwtConfig();
 
-        // Assert
+        // 断言
         Assert.Equal("your-secret-key-here", jwtConfig.Secret);
         Assert.Equal("SmartAIProxy", jwtConfig.Issuer);
         Assert.Equal("SmartAIProxy-Client", jwtConfig.Audience);
         Assert.Equal(60, jwtConfig.ExpiryMinutes);
     }
 
+    /// <summary>
+    /// 测试RateLimitConfig类的默认值是否正确
+    /// </summary>
     [Fact]
     public void RateLimitConfig_DefaultValues_AreCorrect()
     {
-        // Arrange & Act
+        // 准备和执行
         var rateLimitConfig = new RateLimitConfig();
 
-        // Assert
+        // 断言
         Assert.Equal(60, rateLimitConfig.RequestsPerMinute);
         Assert.Equal(10, rateLimitConfig.Burst);
     }
 
+    /// <summary>
+    /// 测试AppConfig类是否可以使用自定义值进行初始化
+    /// </summary>
     [Fact]
     public void AppConfig_CanBeInitializedWithCustomValues()
     {
-        // Arrange & Act
+        // 准备和执行
         var config = new AppConfig
         {
             Server = new ServerConfig { Listen = "0.0.0.0:9090", Timeout = 60, MaxConnections = 2000 },
@@ -203,7 +237,7 @@ public class ConfigModelTests
             }
         };
 
-        // Assert
+        // 断言
         Assert.Equal("0.0.0.0:9090", config.Server.Listen);
         Assert.Equal(60, config.Server.Timeout);
         Assert.Equal(2000, config.Server.MaxConnections);
@@ -229,10 +263,13 @@ public class ConfigModelTests
         Assert.Equal(20, config.Security.RateLimit.Burst);
     }
 
+    /// <summary>
+    /// 测试ChannelConfig类是否可以包含模型映射
+    /// </summary>
     [Fact]
     public void ChannelConfig_CanHaveModelMapping()
     {
-        // Arrange & Act
+        // 准备和执行
         var channelConfig = new ChannelConfig
         {
             Name = "Test Channel",
@@ -243,16 +280,19 @@ public class ConfigModelTests
             }
         };
 
-        // Assert
+        // 断言
         Assert.Equal(2, channelConfig.ModelMapping.Count);
         Assert.Equal("gpt-4", channelConfig.ModelMapping["gpt-3.5-turbo"]);
         Assert.Equal("gpt-4-turbo", channelConfig.ModelMapping["gpt-4"]);
     }
 
+    /// <summary>
+    /// 测试AuthConfig类是否可以包含多个API密钥
+    /// </summary>
     [Fact]
     public void AuthConfig_CanHaveMultipleApiKeys()
     {
-        // Arrange & Act
+        // 准备和执行
         var authConfig = new AuthConfig
         {
             ApiKeys = new Dictionary<string, string>
@@ -263,102 +303,114 @@ public class ConfigModelTests
             }
         };
 
-        // Assert
+        // 断言
         Assert.Equal(3, authConfig.ApiKeys.Count);
         Assert.Equal("default-api-key", authConfig.ApiKeys["default"]);
         Assert.Equal("admin-api-key", authConfig.ApiKeys["admin"]);
         Assert.Equal("user-api-key", authConfig.ApiKeys["user"]);
     }
 
+    /// <summary>
+    /// 测试ChannelConfig类的Status属性是否可以接受不同的值
+    /// </summary>
     [Fact]
     public void ChannelConfig_StatusProperty_AcceptsDifferentValues()
     {
-        // Arrange & Act
+        // 准备和执行
         var channelConfig = new ChannelConfig { Status = "active" };
         
-        // Assert
+        // 断言
         Assert.Equal("active", channelConfig.Status);
         
-        // Act
+        // 执行
         channelConfig.Status = "inactive";
         
-        // Assert
+        // 断言
         Assert.Equal("inactive", channelConfig.Status);
         
-        // Act
+        // 执行
         channelConfig.Status = "maintenance";
         
-        // Assert
+        // 断言
         Assert.Equal("maintenance", channelConfig.Status);
     }
 
+    /// <summary>
+    /// 测试RuleConfig类的Priority属性是否可以接受不同的值
+    /// </summary>
     [Fact]
     public void RuleConfig_PriorityProperty_AcceptsDifferentValues()
     {
-        // Arrange & Act
+        // 准备和执行
         var ruleConfig = new RuleConfig { Priority = 1 };
         
-        // Assert
+        // 断言
         Assert.Equal(1, ruleConfig.Priority);
         
-        // Act
+        // 执行
         ruleConfig.Priority = 10;
         
-        // Assert
+        // 断言
         Assert.Equal(10, ruleConfig.Priority);
         
-        // Act
+        // 执行
         ruleConfig.Priority = 0;
         
-        // Assert
+        // 断言
         Assert.Equal(0, ruleConfig.Priority);
     }
 
+    /// <summary>
+    /// 测试JwtConfig类的ExpiryMinutes属性是否可以接受不同的值
+    /// </summary>
     [Fact]
     public void JwtConfig_ExpiryMinutesProperty_AcceptsDifferentValues()
     {
-        // Arrange & Act
+        // 准备和执行
         var jwtConfig = new JwtConfig { ExpiryMinutes = 30 };
         
-        // Assert
+        // 断言
         Assert.Equal(30, jwtConfig.ExpiryMinutes);
         
-        // Act
+        // 执行
         jwtConfig.ExpiryMinutes = 120;
         
-        // Assert
+        // 断言
         Assert.Equal(120, jwtConfig.ExpiryMinutes);
         
-        // Act
+        // 执行
         jwtConfig.ExpiryMinutes = 0;
         
-        // Assert
+        // 断言
         Assert.Equal(0, jwtConfig.ExpiryMinutes);
     }
 
+    /// <summary>
+    /// 测试RateLimitConfig类的属性是否可以接受不同的值
+    /// </summary>
     [Fact]
     public void RateLimitConfig_Properties_AcceptDifferentValues()
     {
-        // Arrange & Act
+        // 准备和执行
         var rateLimitConfig = new RateLimitConfig { RequestsPerMinute = 30, Burst = 5 };
         
-        // Assert
+        // 断言
         Assert.Equal(30, rateLimitConfig.RequestsPerMinute);
         Assert.Equal(5, rateLimitConfig.Burst);
         
-        // Act
+        // 执行
         rateLimitConfig.RequestsPerMinute = 120;
         rateLimitConfig.Burst = 20;
         
-        // Assert
+        // 断言
         Assert.Equal(120, rateLimitConfig.RequestsPerMinute);
         Assert.Equal(20, rateLimitConfig.Burst);
         
-        // Act
+        // 执行
         rateLimitConfig.RequestsPerMinute = 0;
         rateLimitConfig.Burst = 0;
         
-        // Assert
+        // 断言
         Assert.Equal(0, rateLimitConfig.RequestsPerMinute);
         Assert.Equal(0, rateLimitConfig.Burst);
     }

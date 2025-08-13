@@ -19,6 +19,10 @@ using Xunit;
 
 namespace SmartAIProxy.Tests.Middleware;
 
+/// <summary>
+/// 代理中间件测试类
+/// 用于验证代理中间件的各种功能，包括请求认证、通道选择、请求转发和错误处理
+/// </summary>
 public class ProxyMiddlewareTests
 {
     private readonly Mock<RequestDelegate> _mockNextDelegate;
@@ -30,6 +34,10 @@ public class ProxyMiddlewareTests
     private readonly ProxyMiddleware _middleware;
     private readonly DefaultHttpContext _httpContext;
 
+    /// <summary>
+    /// 代理中间件测试构造函数
+    /// 设置测试所需的模拟对象和HTTP上下文
+    /// </summary>
     public ProxyMiddlewareTests()
     {
         _mockNextDelegate = new Mock<RequestDelegate>();
@@ -50,23 +58,29 @@ public class ProxyMiddlewareTests
         _httpContext = new DefaultHttpContext();
     }
 
+    /// <summary>
+    /// 测试InvokeAsync方法在路径不以/v1开头时是否调用下一个委托
+    /// </summary>
     [Fact]
     public async Task InvokeAsync_CallsNextDelegate_WhenPathDoesNotStartWithV1()
     {
-        // Arrange
+        // 准备
         _httpContext.Request.Path = "/api/test";
 
-        // Act
+        // 执行
         await _middleware.InvokeAsync(_httpContext);
 
-        // Assert
+        // 断言
         _mockNextDelegate.Verify(next => next(_httpContext), Times.Once);
     }
 
+    /// <summary>
+    /// 测试InvokeAsync方法在API密钥缺失时是否返回未授权状态
+    /// </summary>
     [Fact]
     public async Task InvokeAsync_ReturnsUnauthorized_WhenApiKeyIsMissing()
     {
-        // Arrange
+        // 准备
         _httpContext.Request.Path = "/v1/chat/completions";
         _httpContext.Request.Headers.Authorization = new Microsoft.Extensions.Primitives.StringValues("");
 
@@ -83,18 +97,21 @@ public class ProxyMiddlewareTests
 
         _mockConfigService.Setup(service => service.GetConfig()).Returns(config);
 
-        // Act
+        // 执行
         await _middleware.InvokeAsync(_httpContext);
 
-        // Assert
+        // 断言
         Assert.Equal(401, _httpContext.Response.StatusCode);
         _mockNextDelegate.Verify(next => next(_httpContext), Times.Never);
     }
 
+    /// <summary>
+    /// 测试InvokeAsync方法在API密钥无效时是否返回未授权状态
+    /// </summary>
     [Fact]
     public async Task InvokeAsync_ReturnsUnauthorized_WhenApiKeyIsInvalid()
     {
-        // Arrange
+        // 准备
         _httpContext.Request.Path = "/v1/chat/completions";
         _httpContext.Request.Headers.Authorization = new Microsoft.Extensions.Primitives.StringValues("Bearer invalid-key");
 
@@ -111,18 +128,21 @@ public class ProxyMiddlewareTests
 
         _mockConfigService.Setup(service => service.GetConfig()).Returns(config);
 
-        // Act
+        // 执行
         await _middleware.InvokeAsync(_httpContext);
 
-        // Assert
+        // 断言
         Assert.Equal(401, _httpContext.Response.StatusCode);
         _mockNextDelegate.Verify(next => next(_httpContext), Times.Never);
     }
 
+    /// <summary>
+    /// 测试InvokeAsync方法在内容类型不是JSON时是否返回错误请求状态
+    /// </summary>
     [Fact]
     public async Task InvokeAsync_ReturnsBadRequest_WhenContentTypeIsNotJson()
     {
-        // Arrange
+        // 准备
         _httpContext.Request.Path = "/v1/chat/completions";
         _httpContext.Request.Method = "POST";
         _httpContext.Request.Headers.Authorization = new Microsoft.Extensions.Primitives.StringValues("Bearer test-api-key");
@@ -141,18 +161,21 @@ public class ProxyMiddlewareTests
 
         _mockConfigService.Setup(service => service.GetConfig()).Returns(config);
 
-        // Act
+        // 执行
         await _middleware.InvokeAsync(_httpContext);
 
-        // Assert
+        // 断言
         Assert.Equal(400, _httpContext.Response.StatusCode);
         _mockNextDelegate.Verify(next => next(_httpContext), Times.Never);
     }
 
+    /// <summary>
+    /// 测试InvokeAsync方法在没有可用通道时是否返回服务不可用状态
+    /// </summary>
     [Fact]
     public async Task InvokeAsync_ReturnsServiceUnavailable_WhenNoChannelIsAvailable()
     {
-        // Arrange
+        // 准备
         _httpContext.Request.Path = "/v1/chat/completions";
         _httpContext.Request.Method = "POST";
         _httpContext.Request.Headers.Authorization = new Microsoft.Extensions.Primitives.StringValues("Bearer test-api-key");
@@ -173,18 +196,21 @@ public class ProxyMiddlewareTests
         _mockRuleEngine.Setup(engine => engine.EvaluateRules(It.IsAny<List<RuleConfig>>(), It.IsAny<List<ChannelConfig>>(), It.IsAny<Dictionary<string, object>>()))
             .Returns((ChannelConfig?)null);
 
-        // Act
+        // 执行
         await _middleware.InvokeAsync(_httpContext);
 
-        // Assert
+        // 断言
         Assert.Equal(503, _httpContext.Response.StatusCode);
         _mockNextDelegate.Verify(next => next(_httpContext), Times.Never);
     }
 
+    /// <summary>
+    /// 测试InvokeAsync方法在所有条件满足时是否转发请求
+    /// </summary>
     [Fact]
     public async Task InvokeAsync_ForwardsRequest_WhenAllConditionsAreMet()
     {
-        // Arrange
+        // 准备
         _httpContext.Request.Path = "/v1/chat/completions";
         _httpContext.Request.Method = "POST";
         _httpContext.Request.Headers.Authorization = new Microsoft.Extensions.Primitives.StringValues("Bearer test-api-key");
@@ -218,7 +244,7 @@ public class ProxyMiddlewareTests
         _mockRuleEngine.Setup(engine => engine.EvaluateRules(It.IsAny<List<RuleConfig>>(), It.IsAny<List<ChannelConfig>>(), It.IsAny<Dictionary<string, object>>()))
             .Returns(channel);
 
-        // Mock HttpClient
+        // 模拟HttpClient
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -234,19 +260,22 @@ public class ProxyMiddlewareTests
         var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         _mockHttpClientFactory.Setup(factory => factory.CreateClient()).Returns(httpClient);
 
-        // Act
+        // 执行
         await _middleware.InvokeAsync(_httpContext);
 
-        // Assert
+        // 断言
         Assert.Equal(200, _httpContext.Response.StatusCode);
         _mockChannelService.Verify(service => service.UpdateChannelUsage("Test Channel", It.IsAny<int>()), Times.Once);
         _mockNextDelegate.Verify(next => next(_httpContext), Times.Never);
     }
 
+    /// <summary>
+    /// 测试InvokeAsync方法在转发请求时是否处理异常
+    /// </summary>
     [Fact]
     public async Task InvokeAsync_HandlesException_WhenForwardingRequest()
     {
-        // Arrange
+        // 准备
         _httpContext.Request.Path = "/v1/chat/completions";
         _httpContext.Request.Method = "POST";
         _httpContext.Request.Headers.Authorization = new Microsoft.Extensions.Primitives.StringValues("Bearer test-api-key");
@@ -280,7 +309,7 @@ public class ProxyMiddlewareTests
         _mockRuleEngine.Setup(engine => engine.EvaluateRules(It.IsAny<List<RuleConfig>>(), It.IsAny<List<ChannelConfig>>(), It.IsAny<Dictionary<string, object>>()))
             .Returns(channel);
 
-        // Mock HttpClient to throw an exception
+        // 模拟HttpClient抛出异常
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -292,18 +321,21 @@ public class ProxyMiddlewareTests
         var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         _mockHttpClientFactory.Setup(factory => factory.CreateClient()).Returns(httpClient);
 
-        // Act
+        // 执行
         await _middleware.InvokeAsync(_httpContext);
 
-        // Assert
+        // 断言
         Assert.Equal(502, _httpContext.Response.StatusCode);
         _mockNextDelegate.Verify(next => next(_httpContext), Times.Never);
     }
 
+    /// <summary>
+    /// 测试InvokeAsync方法是否处理GET请求
+    /// </summary>
     [Fact]
     public async Task InvokeAsync_HandlesGetRequest()
     {
-        // Arrange
+        // 准备
         _httpContext.Request.Path = "/v1/models";
         _httpContext.Request.Method = "GET";
         _httpContext.Request.Headers.Authorization = new Microsoft.Extensions.Primitives.StringValues("Bearer test-api-key");
@@ -332,7 +364,7 @@ public class ProxyMiddlewareTests
         _mockRuleEngine.Setup(engine => engine.EvaluateRules(It.IsAny<List<RuleConfig>>(), It.IsAny<List<ChannelConfig>>(), It.IsAny<Dictionary<string, object>>()))
             .Returns(channel);
 
-        // Mock HttpClient
+        // 模拟HttpClient
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -348,18 +380,21 @@ public class ProxyMiddlewareTests
         var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         _mockHttpClientFactory.Setup(factory => factory.CreateClient()).Returns(httpClient);
 
-        // Act
+        // 执行
         await _middleware.InvokeAsync(_httpContext);
 
-        // Assert
+        // 断言
         Assert.Equal(200, _httpContext.Response.StatusCode);
         _mockNextDelegate.Verify(next => next(_httpContext), Times.Never);
     }
 
+    /// <summary>
+    /// 测试InvokeAsync方法是否正确估算令牌数
+    /// </summary>
     [Fact]
     public async Task InvokeAsync_EstimatesTokensCorrectly()
     {
-        // Arrange
+        // 准备
         _httpContext.Request.Path = "/v1/chat/completions";
         _httpContext.Request.Method = "POST";
         _httpContext.Request.Headers.Authorization = new Microsoft.Extensions.Primitives.StringValues("Bearer test-api-key");
@@ -393,7 +428,7 @@ public class ProxyMiddlewareTests
         _mockRuleEngine.Setup(engine => engine.EvaluateRules(It.IsAny<List<RuleConfig>>(), It.IsAny<List<ChannelConfig>>(), It.IsAny<Dictionary<string, object>>()))
             .Returns(channel);
 
-        // Mock HttpClient
+        // 模拟HttpClient
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -409,18 +444,21 @@ public class ProxyMiddlewareTests
         var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         _mockHttpClientFactory.Setup(factory => factory.CreateClient()).Returns(httpClient);
 
-        // Act
+        // 执行
         await _middleware.InvokeAsync(_httpContext);
 
-        // Assert
-        // The response content has multiple words, so the token estimation should be greater than 0
+        // 断言
+        // 响应内容包含多个单词，因此令牌估算应该大于0
         _mockChannelService.Verify(service => service.UpdateChannelUsage("Test Channel", It.Is<int>(tokens => tokens > 0)), Times.Once);
     }
 
+    /// <summary>
+    /// 测试InvokeAsync方法是否正确构建目标URL
+    /// </summary>
     [Fact]
     public async Task InvokeAsync_BuildsTargetUrlCorrectly()
     {
-        // Arrange
+        // 准备
         _httpContext.Request.Path = "/v1/chat/completions";
         _httpContext.Request.Method = "POST";
         _httpContext.Request.Headers.Authorization = new Microsoft.Extensions.Primitives.StringValues("Bearer test-api-key");
@@ -455,7 +493,7 @@ public class ProxyMiddlewareTests
         _mockRuleEngine.Setup(engine => engine.EvaluateRules(It.IsAny<List<RuleConfig>>(), It.IsAny<List<ChannelConfig>>(), It.IsAny<Dictionary<string, object>>()))
             .Returns(channel);
 
-        // Mock HttpClient to capture the request URL
+        // 模拟HttpClient以捕获请求URL
         HttpRequestMessage capturedRequest = null;
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         mockHttpMessageHandler.Protected()
@@ -473,10 +511,10 @@ public class ProxyMiddlewareTests
         var httpClient = new HttpClient(mockHttpMessageHandler.Object);
         _mockHttpClientFactory.Setup(factory => factory.CreateClient()).Returns(httpClient);
 
-        // Act
+        // 执行
         await _middleware.InvokeAsync(_httpContext);
 
-        // Assert
+        // 断言
         Assert.NotNull(capturedRequest);
         Assert.Equal("https://api.openai.com/v1/chat/completions", capturedRequest.RequestUri.ToString());
     }
